@@ -14,16 +14,20 @@ const players = (function () {                                   ///////////// p
     return {one,two}    
 })();
 
-(function buttonControl() {                                      ///////////// ugly, this regulates what all the buttons do
+(function buttonControl() {                                      ///////////// this regulates what happens when u press buttons
+
     const buttons = document.querySelector(".button-container")
     let mode = ""
+
     buttons.addEventListener("click", event => {
         if (event.target.className === "single-player" && mode !== "Singleplayer") {
+
             if (mode === ""){
                 players.one.name = "Human"
                 players.two.name = "Computer"
                 addButtons()
                 addScoreboard(players.one.name,players.two.name)
+
             }else if (mode === "Multiplayer") {
                 resetBoard()
                 players.one.name = "Human"
@@ -32,33 +36,42 @@ const players = (function () {                                   ///////////// p
                 players.two.token = "O" 
                 resetScoreboard()  
             }
+
             mode = "Singleplayer"
             gameFlow(["","","","","","","","",""])
+
         }else if (event.target.className === "multi-player" && mode !== "Multiplayer") {
+
             if (mode === ""){
                 players.one.name = "Player 1"
                 players.two.name = "Player 2"
                 addButtons()
                 addScoreboard(players.one.name,players.two.name)
+
             }else if (mode === "Singleplayer") {
                 resetBoard()
                 players.one.name = "Player 1"
                 players.two.name = "Player 2"
                 resetScoreboard()   
             }
+
             mode = "Multiplayer"
             gameFlowMP(["","","","","","","","",""],"X")
             
         }else if (event.target.className === "reset-board") {
+
             if (mode === "Singleplayer") {
                 resetBoard()
                 gameFlow(["","","","","","","","",""])
+
             }else if (mode === "Multiplayer") {
                 resetBoard()
                 gameFlowMP(["","","","","","","","",""],"X")
             }
+
         }else if (event.target.className === "reset-score") {
             resetScoreboard(players.one.name,players.two.name)
+
         }else if (event.target.className === "change-names") {
             const playerOneNew = document.querySelector("#player-one-input")
             players.one.name = playerOneNew.value
@@ -70,9 +83,12 @@ const players = (function () {                                   ///////////// p
             players.one.token = switchTokens(players.one.token)
             players.two.token = switchTokens(players.two.token)
             updateDisplay()
+            resetBoard()
+            gameFlowMP(["","","","","","","","",""],"X")
         }
     })
 })();
+
 function updateDisplay () {
     const player = document.querySelector(".player-one")
     player.textContent = `(${players.one.token})${players.one.name}: ${players.one.getScore()}`
@@ -89,10 +105,12 @@ function resetScoreboard () {
 function resetBoard() {
     const board = document.querySelector(".board")
     const body = document.querySelector("body")
+
     if (body.childElementCount > 4) {
         const winner = document.querySelector(".winner")
         winner.remove()
         }
+
     board.remove()    
 };
 
@@ -106,6 +124,7 @@ function addButtons() {
     const resetScore = document.createElement("button")
     resetScore.className = "reset-score"
     resetScore.textContent = "Reset Score"
+
     const playerOneInput = document.createElement("input")
     playerOneInput.placeholder = players.one.name
     playerOneInput.id = "player-one-input"
@@ -115,6 +134,7 @@ function addButtons() {
     const changeNames = document.createElement("button")
     changeNames.className = "change-names"
     changeNames.textContent = "Change Names"
+
     const changeTokens = document.createElement("button")
     changeTokens.className = "change-tokens"
     changeTokens.textContent = "Change Tokens(MP)"
@@ -127,21 +147,26 @@ function addScoreboard(player1,player2) {                       ///////////// ma
     const body = document.querySelector("body")
     const scoreBoard = document.createElement("div")
     scoreBoard.className = "score"
+
     const player = document.createElement("div")
     player.className = "player-one"
     player.textContent = `(${players.one.token})${player1}: ${players.one.getScore()}`
     const secondPlayer = document.createElement("div")
     secondPlayer.className = "player-two"
     secondPlayer.textContent = `(${players.two.token})${player2}: ${players.two.getScore()}`
+
     scoreBoard.append(player,secondPlayer)
     body.append(scoreBoard) 
 };
 
 function displayBoard(array) {                                  ///////////// makes the board in the DOM  
+
     const body = document.querySelector("body")                
     const board = document.createElement("div")
     board.className = "board"
+
     let index = 0
+
     array.forEach(element => {
         const block = document.createElement("div")
         block.className = "block"
@@ -151,19 +176,23 @@ function displayBoard(array) {                                  ///////////// ma
         index ++
 
     });
+
     body.append(board)
 };
 
 function displayWin(winnerArray) {                              ///////////// declares winner and highlights the winning fields
+
     winnerArray.slice(0,3).forEach(element => {
         const block = document.getElementById(`${element}`)
         block.className = "blue"
     })
+
     const body = document.querySelector("body")
     const winner = document.createElement("div")
     winner.className = "winner"
     winner.textContent = `The winner is: ${winnerArray[3]}`
     body.append(winner)
+
     updateScore(winnerArray[3])
     updateDisplay()
     
@@ -178,57 +207,78 @@ function updateScore(token) {                                   ///////////// in
 };
 
 function checkWinner(array,token) {                             ///////////// simple algorhitm - 8 different solutions
+
     if (array[0] === token) {
+
         if (array[1] === token && array[2] === token) {
             return [true,0,1,2,token]
+
         }else if (array[3] === token && array[6] === token) {
             return [true,0,3,6,token]
+
         }else if (array[4] === token && array[8] === token) {
             return [true,0,4,8,token]
         }
+
     }if (array[1] === token && array[4] === token && array[7] === token ) {
         return [true,1,4,7,token]
+
     }if (array[2] === token) {
+
         if (array[4] === token && array[6] === token) {
             return [true,2,4,6,token]
+
         }else if (array[5] === token && array[8] === token) {
             return [true,2,5,8,token]
         }
+
     }if (array[3] === token && array[4] === token && array[5] === token ) {
         return [true,3,4,5,token]
+
     }if (array[6] === token && array[7] === token && array[8] === token ) {
         return [true,6,7,8,token]
     }
+
     return [false]
 };
 
 ///////////////////////////////////////////////////////////////////////////// SINGLEPLAYER //////////////////////////////////////////////////////
 
 function gameFlow (array) {                                     ///////////// the whole flow -SINGLEPLAYER-
+
     const winnerX = checkWinner(array,"X")
+
     if (winnerX[0] === true) {                                           /// 1.Check for x victory -loop ends -
         displayBoard(array)
         displayWin(winnerX.slice(1))
+
     }else if (array.indexOf("O") === -1 && array.indexOf("X") === -1 ) { /// 2. check if the board is empty - starts the loop
         displayBoard(array)
         singlePlayerTurn(array)
+
     }else if (array.indexOf("") > -1) {                                  /// 3. check if there are empty fields - continues the loop 
         array = makeAiTurn(array)
         displayBoard(array)
+
         const winnerO = checkWinner(array,"O")
+
         if (winnerO[0] === true) {                                       /// 3a. check for o victory -loop ends
             displayWin(winnerO.slice(1))
         }else {
             singlePlayerTurn(array)
         }
+
     }else {                                                              //// if the board is full, it gets displayed game is tied -loop ends
         displayBoard(array)
     }
 };
 
 function singlePlayerTurn(array) {                              ///////////// player selects field, than board is removed - continues the loop
+
     const board = document.querySelector(".board")
+
     board.addEventListener("click", event => {
+
         if (event.target.textContent === "") {
             array[event.target.id] = "X"
             board.remove()
@@ -238,36 +288,43 @@ function singlePlayerTurn(array) {                              ///////////// pl
 };
 
 function makeAiTurn (array) {                                   ///////////// simple recursion - AI is not very smart
+
     let = randomNumber = Math.floor(Math.random()* (8 - 0 + 1)) + 0;
-    console.log(randomNumber)
     return array[randomNumber] === "" ? array.toSpliced(randomNumber, 1 , "O") : makeAiTurn(array)
 };
 
 ///////////////////////////////////////////////////////////////////////////// MULTIPLAYER //////////////////////////////////////////////////////
 
 function gameFlowMP (array,token) {
+
     const winner = checkWinner(array,token)
     if (winner[0] === true) {                                           /// 1.Check for  victory -loop ends -
         displayBoard(array)
         displayWin(winner.slice(1))
+
     }else if (array.indexOf("O") === -1 && array.indexOf("X") === -1 ){
         displayBoard(array)
         multiPlayerTurn(array,token)
+
     }else if (array.indexOf("") > -1) {
         displayBoard(array)
         multiPlayerTurn(array,switchTokens(token))
+
     }else {
         displayBoard(array)
     }
 };
 
 function switchTokens(token) {
+
     return token === "X" ? "O" : "X"
 };
 
 function multiPlayerTurn (array,token) {
+
     const board = document.querySelector(".board")
     board.addEventListener("click", event => {
+        
         if (event.target.textContent === "") {
             array[event.target.id] = token
             board.remove()
